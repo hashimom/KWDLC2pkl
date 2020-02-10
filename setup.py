@@ -22,12 +22,13 @@ from setuptools import setup
 
 setup(
     name='KWDLC2pkl',
-    version='0.0.1',
+    version='0.0.2',
     packages=['kwdlc2pkl'],
     url='https://github.com/hashimom/KWDLC2pkl',
     license='MIT',
     author='Masahiko Hashimoto',
     author_email='hashimom@geeko.jp',
+    install_requires=['tqdm'],
     entry_points={
         'console_scripts': [
             'kwdlc2pkl=kwdlc2pkl.worker:main',

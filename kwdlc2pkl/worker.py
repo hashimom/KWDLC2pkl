@@ -19,6 +19,7 @@
 """
 import os
 import argparse
+from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 from kwdlc2pkl.parser import Parser
 
@@ -66,11 +67,20 @@ def main():
     # 入出力パスリストの作成
     for i, path in enumerate(in_file_list):
         in_file_list[i] = os.path.abspath(args.in_path + "/" + path)
-    out_path_list = [out_path] * len(in_file_list)
 
-    with ProcessPoolExecutor(max_workers=args.proc_num) as executor:
-        executor.map(worker, in_file_list, out_path_list)
-    print("output files: %d" % len(in_file_list))
+    with ProcessPoolExecutor(max_workers=args.proc_num) as pool:
+        with tqdm(total=len(in_file_list)) as progress:
+            futures = []
+
+            for file in in_file_list:
+                future = pool.submit(worker, file, out_path)
+                future.add_done_callback(lambda p: progress.update())
+                futures.append(future)
+
+            results = []
+            for future in futures:
+                result = future.result()
+                results.append(result)
 
 
 if __name__ == "__main__":
